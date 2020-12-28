@@ -7,6 +7,7 @@ const path = require('path')
 const _ = require('underscore')
 const moment = require('moment')
 const fs = require('fs')
+const { v4: uuidv4 } = require('uuid');
 
 async function start() {
     try {
@@ -103,14 +104,21 @@ async function getMessageDetails(messages, labelIds) {
                 }
                 break; 
             case 'application/pdf':
-                object.attachmentId = rootPart.body.attachmentId
+                if (!object.attachments) {
+                    object.attachments = []
+                }
+
+                const attachment = await gmail.users.messages.attachments.get({userId: 'me', messageId: object.id, id: rootPart.body.attachmentId})
+                if (attachment || attachment.status == 200 || attachment.data || attachment.data.data) {
+                    let attachmentObject = {
+                        attachmentId: rootPart.body.attachmentId,
+                        attachmentBase64: attachment.data.data,
+                        fileName: `${uuidv4()}.pdf`,
+                    }
+                    saveBase64ValueToFileSync(attachment.attachmentBase64, 'attachments', attachmentObject.fileName)
+                    object.attachments.push(attachmentObject)
+                }
                 break; 
-            }
-        }
-        if (object.attachmentId) {
-            const attachment = await gmail.users.messages.attachments.get({userId: 'me', messageId: object.id, id: object.attachmentId})
-            if (attachment || attachment.status == 200 || attachment.data || attachment.data.data) {
-                object.attachmentBase64 = attachment.data.data
             }
         }
         console.log(object)
@@ -124,13 +132,10 @@ function decodeBase64(base64) {
     return Buffer.from(base64, 'base64').toString()
 }
 
-function saveBase64ValueToFileSync(base64, fileName) {
+function saveBase64ValueToFileSync(base64, directory, fileName) {
     const buffer = Buffer.from(base64, 'base64')
-    fs.writeFileSync(fileName, buffer, error => {
-        if (error) {
-            throw(error)
-        }
-    })
+    fs.mkdirSync(directory, { recursive: true })
+    fs.writeFileSync(path.join(directory, fileName), buffer)
 }
 
 start()
