@@ -1,12 +1,14 @@
 "use strict";
 
-const moment = require('moment');
-
 /**
  * JavaScript doesn't support interfaces so sub-classing is used in place.
  * All email scripts must subclass this class.
  */
 const baseEmailScript = {
+    /**
+     * Display name to be used in composing the email
+     */
+    displayName: null,
     /**
      * LabelName of the emails to check.
      */
@@ -25,12 +27,6 @@ const baseEmailScript = {
     price: function() {
         throw 'Subclass must implement price()'
         return this.price
-    },
-    /**
-     * Date to start reading emails. By default, this returns a month and a day ago.
-     */
-    fromDate: function() {
-        return moment.utc().subtract(1, 'months').subtract(1, 'days')
     }
 }
 
