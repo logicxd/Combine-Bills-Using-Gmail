@@ -1,4 +1,9 @@
-### Gitignore for node
+################# Personal Files #######################
+config/config.*.json
+
+######################################################
+ 
+################# Gitignore for node #################
 # Logs
 logs
 *.log
@@ -115,8 +120,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+####################################################
 
-### VSCode gitignore
+################# VSCode gitignore #################
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -126,8 +132,10 @@ dist
 
 # Local History for Visual Studio Code
 .history/
+###################################################
 
-### MacOS gitignore
+
+################# MacOS gitignore #################
 # General
 .DS_Store
 .AppleDouble
