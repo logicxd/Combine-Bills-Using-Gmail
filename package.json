@@ -1,0 +1,23 @@
+{
+  "name": "auto-fetch-monthly-bills",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logicxd/auto-fetch-monthly-bills.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/logicxd/auto-fetch-monthly-bills/issues"
+  },
+  "homepage": "https://github.com/logicxd/auto-fetch-monthly-bills#readme",
+  "dependencies": {
+    "googleapis": "^66.0.0",
+    "moment": "^2.29.1"
+  }
+}
