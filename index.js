@@ -10,19 +10,22 @@ const fs = require('fs')
 const { v4: uuidv4 } = require('uuid');
 
 async function start() {
-    try {
-        const labelsMap = await getLabels()
-        const emailScripts = getEmailScripts()
-        const labelIds = filterLabelsBasedOnEmailScripts(labelsMap, emailScripts)
-        const messages = await gmail.users.messages.list({userId: 'me', labelIds: labelIds, q: `after:${afterDate()}`})
-        const messageDetails = await getMessageDetails(messages, labelIds)
-        console.log(messageDetails)
-    } catch (error) {
-        console.error(`Error: ${error}`)
+    const labelsMap = await getLabels()
+    const emailScripts = getEmailScripts()
+    const labelIds = filterLabelsBasedOnEmailScripts(labelsMap, emailScripts)
+    const messages = await gmail.users.messages.list({userId: 'me', labelIds: labelIds, q: `after:${afterDate()}`})
+    const messageDetails = await getMessageDetails(messages, labelIds)
+    parseEmails(messageDetails, emailScripts)
+}
+
+//////////// Helpers ////////////
+function parseEmails(messageDetails, emailScripts) {
+    for (const [key, value] of Object.entries(messageDetails)) {
+        let emailScript = _.find(emailScripts, script => { return script.labelId === key })
+        emailScript.parseEmail(value)
     }
 }
 
-// Helpers
 async function getLabels() {
     const labels = await gmail.users.labels.list({userId: 'me'})
 
@@ -53,17 +56,12 @@ function filterLabelsBasedOnEmailScripts(labelsMap, emailScripts) {
     emailScripts.forEach(script => {
         const labelName = script.labelName
         if (labelName != null && labelsMap[labelName]) {
-            labelIds.push(labelsMap[labelName])
+            const labelId = labelsMap[labelName]
+            script.labelId = labelId
+            labelIds.push(labelId)
         }
     })
     return labelIds
-}
-
-/**
- * @returns current date minus 1 month and 1 day. The 1 extra day is just to make sure we don't miss anything.
- */
-function afterDate() {
-    return moment.utc().subtract(1, 'months').subtract(1, 'days').format('YYYY/MM/DD')
 }
 
 /**
@@ -95,7 +93,6 @@ async function getMessageDetails(messages, labelIds) {
             }
         }
         for (const rootPart of messageDetail.data.payload.parts) {
-            console.log(rootPart)
             switch(rootPart.mimeType) {
             case 'multipart/alternative':
                 let innerPart = _.find(rootPart.parts, part => { return part.mimeType === 'text/plain' })
@@ -115,23 +112,41 @@ async function getMessageDetails(messages, labelIds) {
                         attachmentBase64: attachment.data.data,
                         fileName: `${uuidv4()}.pdf`,
                     }
-                    saveBase64ValueToFileSync(attachment.attachmentBase64, 'attachments', attachmentObject.fileName)
+                    saveBase64ValueToFileSync(attachmentObject.attachmentBase64, 'attachments', attachmentObject.fileName)
                     object.attachments.push(attachmentObject)
                 }
                 break; 
             }
         }
-        console.log(object)
         messageDetails[object.labelId] = object
     }
     return messageDetails
 }
 
+//////////// Utilities ////////////
+
+/**
+ * @returns current date minus 1 month and 1 day. The 1 extra day is just to make sure we don't miss anything.
+ */
+function afterDate() {
+    return moment.utc().subtract(1, 'months').subtract(1, 'days').format('YYYY/MM/DD')
+}
+
+/**
+ * Decodes base64 value for email attachments
+ * @param {*} base64 encoded string
+ */
 function decodeBase64(base64) {
     base64 = base64.replace(/-/g, '+').replace(/_/g, '/')
     return Buffer.from(base64, 'base64').toString()
 }
 
+/**
+ * Creates directory if needed and creates the file to that directory
+ * @param {*} base64 encoded string
+ * @param {*} directory directory path
+ * @param {*} fileName file name
+ */
 function saveBase64ValueToFileSync(base64, directory, fileName) {
     const buffer = Buffer.from(base64, 'base64')
     fs.mkdirSync(directory, { recursive: true })

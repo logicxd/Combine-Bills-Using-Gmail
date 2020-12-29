@@ -14,10 +14,14 @@ const baseEmailScript = {
      */
     labelName: null,
     /**
+     * LabelId that will be fetched dynamically from API results
+     */
+    labelId: null,
+    /**
      * Given the email object
      * Should sets `price`
      */
-    parseEmail: function() {
+    parseEmail: function(messageDetail) {
         throw 'Subclass must implement parseEmail(email)'
         this.price = 0
     },
