@@ -19,6 +19,4 @@ function authenticateWithExistingRefreshToken() {
 }
 
 authenticateWithExistingRefreshToken()
-module.exports = {
-    google
-}
+module.exports = google

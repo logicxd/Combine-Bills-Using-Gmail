@@ -19,19 +19,19 @@ const baseEmailScript = {
     labelId: null,
     /**
      * Given the email object
-     * Should sets `price`
+     * Should return an object with related details
      */
-    parseEmail: function(messageDetail) {
+    parseEmail: async function(messageDetail) {
         throw 'Subclass must implement parseEmail(email)'
         this.price = 0
     },
-    /**
-     * Total price of bill
-     */
-    price: function() {
-        throw 'Subclass must implement price()'
-        return this.price
-    }
+    // /**
+    //  * Total price of bill
+    //  */
+    // price: function() {
+    //     throw 'Subclass must implement price()'
+    //     return this.price
+    // }
 }
 
 module.exports = baseEmailScript

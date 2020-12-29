@@ -1,28 +1,27 @@
 "use strict";
 
-const {google} = require('./googleapi')
+const google = require('./googleapi')
 const gmail = google.gmail('v1')
 const glob = require('glob')
 const path = require('path')
 const _ = require('underscore')
-const moment = require('moment')
-const fs = require('fs')
 const { v4: uuidv4 } = require('uuid');
+const Utils = require('./utility')
 
 async function start() {
     const labelsMap = await getLabels()
     const emailScripts = getEmailScripts()
     const labelIds = filterLabelsBasedOnEmailScripts(labelsMap, emailScripts)
-    const messages = await gmail.users.messages.list({userId: 'me', labelIds: labelIds, q: `after:${afterDate()}`})
+    const messages = await gmail.users.messages.list({userId: 'me', labelIds: labelIds, q: `after:${Utils.afterDate()}`})
     const messageDetails = await getMessageDetails(messages, labelIds)
-    parseEmails(messageDetails, emailScripts)
+    await parseEmails(messageDetails, emailScripts)
 }
 
 //////////// Helpers ////////////
-function parseEmails(messageDetails, emailScripts) {
+async function parseEmails(messageDetails, emailScripts) {
     for (const [key, value] of Object.entries(messageDetails)) {
         let emailScript = _.find(emailScripts, script => { return script.labelId === key })
-        emailScript.parseEmail(value)
+        await emailScript.parseEmail(value)
     }
 }
 
@@ -97,7 +96,7 @@ async function getMessageDetails(messages, labelIds) {
             case 'multipart/alternative':
                 let innerPart = _.find(rootPart.parts, part => { return part.mimeType === 'text/plain' })
                 if (innerPart) {
-                    object.body = decodeBase64(innerPart.body.data)
+                    object.body = Utils.decodeBase64(innerPart.body.data)
                 }
                 break; 
             case 'application/pdf':
@@ -108,11 +107,12 @@ async function getMessageDetails(messages, labelIds) {
                 const attachment = await gmail.users.messages.attachments.get({userId: 'me', messageId: object.id, id: rootPart.body.attachmentId})
                 if (attachment || attachment.status == 200 || attachment.data || attachment.data.data) {
                     let attachmentObject = {
-                        attachmentId: rootPart.body.attachmentId,
-                        attachmentBase64: attachment.data.data,
+                        id: rootPart.body.attachmentId,
+                        base64Value: attachment.data.data,
+                        directory: 'attachments',
                         fileName: `${uuidv4()}.pdf`,
                     }
-                    saveBase64ValueToFileSync(attachmentObject.attachmentBase64, 'attachments', attachmentObject.fileName)
+                    Utils.saveBase64ValueToFileSync(attachmentObject.base64Value, attachmentObject.directory, attachmentObject.fileName)
                     object.attachments.push(attachmentObject)
                 }
                 break; 
@@ -121,36 +121,6 @@ async function getMessageDetails(messages, labelIds) {
         messageDetails[object.labelId] = object
     }
     return messageDetails
-}
-
-//////////// Utilities ////////////
-
-/**
- * @returns current date minus 1 month and 1 day. The 1 extra day is just to make sure we don't miss anything.
- */
-function afterDate() {
-    return moment.utc().subtract(1, 'months').subtract(1, 'days').format('YYYY/MM/DD')
-}
-
-/**
- * Decodes base64 value for email attachments
- * @param {*} base64 encoded string
- */
-function decodeBase64(base64) {
-    base64 = base64.replace(/-/g, '+').replace(/_/g, '/')
-    return Buffer.from(base64, 'base64').toString()
-}
-
-/**
- * Creates directory if needed and creates the file to that directory
- * @param {*} base64 encoded string
- * @param {*} directory directory path
- * @param {*} fileName file name
- */
-function saveBase64ValueToFileSync(base64, directory, fileName) {
-    const buffer = Buffer.from(base64, 'base64')
-    fs.mkdirSync(directory, { recursive: true })
-    fs.writeFileSync(path.join(directory, fileName), buffer)
 }
 
 start()

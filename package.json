@@ -20,6 +20,7 @@
     "glob": "^7.1.6",
     "googleapis": "^66.0.0",
     "moment": "^2.29.1",
+    "pdf-parse": "^1.1.1",
     "underscore": "^1.12.0",
     "uuid": "^8.3.2"
   }
