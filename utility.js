@@ -8,7 +8,18 @@ const moment = require('moment')
  * @returns current date minus 1 month and 1 day. The 1 extra day is just to make sure we don't miss anything.
  */
 function afterDate() {
-    return moment.utc().subtract(1, 'months').subtract(1, 'days').format('YYYY/MM/DD')
+    return moment.utc().subtract(1, 'months').subtract(1, 'days')
+}
+
+/**
+ * Encodes to base64 value for email attachments
+ * @param {*} text plain text
+ */
+function encodeBase64(text) {
+    return Buffer.from(text).toString('base64')
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '')
 }
 
 /**
@@ -34,6 +45,7 @@ function saveBase64ValueToFileSync(base64, directory, fileName) {
 
 module.exports = {
     afterDate,
+    encodeBase64,
     decodeBase64,
     saveBase64ValueToFileSync
 }

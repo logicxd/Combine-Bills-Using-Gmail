@@ -9,7 +9,6 @@ const waterBill = Object.create(baseEmailScript)
 waterBill.displayName = 'Water'
 waterBill.labelName = 'Automated/MitchellPlace/Water'
 waterBill.parseEmail = async function(messageDetail) {
-    console.log('Parsing Water Bill...')
     if (!messageDetail || !messageDetail.attachments || messageDetail.attachments.length < 1) {
         console.warn('PDF attachments not found. Water bill cannot be retrieved.')
         return {success: false}
@@ -24,7 +23,7 @@ waterBill.parseEmail = async function(messageDetail) {
     let billAmount = 0
     for (const text of lineSeparatedArray) {
         if (isTotalAmountDueTextFound && text.includes('$')) {
-            billAmount = text.split('$')[1]
+            billAmount = parseFloat(text.split('$')[1])
             break
         } else if (text === 'Total Amount Due') {
             isTotalAmountDueTextFound = true
@@ -34,9 +33,10 @@ waterBill.parseEmail = async function(messageDetail) {
     let parsedObject = {
         success: isTotalAmountDueTextFound,
         billAmount,
-        billDescription: `Water: $${billAmount}`
+        billDescription: `Water: $${billAmount} (billed once every 2 months)`,
+        fileName: `Water_${attachment.fileName}`,
+        fileData: attachment.base64Value
     }
-    console.log(`  ${parsedObject.billDescription}`)
     return parsedObject
 }
 module.exports = waterBill
