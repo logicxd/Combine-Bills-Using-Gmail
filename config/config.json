@@ -1,5 +1,11 @@
 {
     "refresh_token": "",
     "client_id": "",
-    "client_secret": ""
+    "client_secret": "",
+    "email": {
+        "sender_name": "Autobot",
+        "email_address": "sample_from@email.com",
+        "subject": "Automated Bill",
+        "to": ["sample_to@email.com"]
+    }
 }
