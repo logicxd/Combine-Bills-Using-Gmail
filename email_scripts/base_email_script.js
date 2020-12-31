@@ -38,13 +38,6 @@ const baseEmailScript = {
         throw 'Subclass must implement parseEmail(email)'
         this.price = 0
     },
-    // /**
-    //  * Total price of bill
-    //  */
-    // price: function() {
-    //     throw 'Subclass must implement price()'
-    //     return this.price
-    // }
 }
 
 module.exports = baseEmailScript

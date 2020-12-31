@@ -17,7 +17,7 @@ async function start() {
     const labelsMap = await getLabels()
     const emailScripts = getEmailScripts()
     const labelIds = filterLabelsBasedOnEmailScripts(labelsMap, emailScripts)
-    const messages = await gmail.users.messages.list({userId: 'me', labelIds: labelIds, q: `after:${afterDate.format('YYYY/MM/DD')}`})
+    const messages = await gmail.users.messages.list({userId: 'me', labelIds: labelsMap[config.email.labelName], q: `after:${afterDate.format('YYYY/MM/DD')}`})
     const messageDetails = await getMessageDetails(messages, labelIds)
     const parsedEmails = await parseEmails(messageDetails, emailScripts)
     await sendEmail(parsedEmails)
@@ -92,12 +92,15 @@ async function getMessageDetails(messages, labelIds) {
         }
         for (const rootPart of messageDetail.data.payload.parts) {
             switch(rootPart.mimeType) {
+            case 'text/html':
+                object.body = rootPart.body.data
+                break
             case 'multipart/alternative':
                 let innerPart = _.find(rootPart.parts, part => { return part.mimeType === 'text/plain' })
                 if (innerPart) {
                     object.body = Utils.decodeBase64(innerPart.body.data)
                 }
-                break; 
+                break
             case 'application/pdf':
                 if (!object.attachments) {
                     object.attachments = []
@@ -114,7 +117,7 @@ async function getMessageDetails(messages, labelIds) {
                     Utils.saveBase64ValueToFileSync(attachmentObject.base64Value, attachmentObject.directory, attachmentObject.fileName)
                     object.attachments.push(attachmentObject)
                 }
-                break; 
+                break
             }
         }
         object.payload = messageDetail.data.payload
@@ -127,7 +130,8 @@ async function parseEmails(messageDetails, emailScripts) {
     let parsedEmails = []
     for (const [key, value] of Object.entries(messageDetails)) {
         let emailScript = _.find(emailScripts, script => { return script.labelId === key })
-        console.log(`Parsing for email script: ${emailScript.displayName}...`)
+        if (!emailScript) { continue }
+        console.log(`Parsing for email script: ${emailScript.displayName}`)
         parsedEmails.push(await emailScript.parseEmail(value))
     }
     return parsedEmails
@@ -135,7 +139,7 @@ async function parseEmails(messageDetails, emailScripts) {
 
 async function sendEmail(parsedEmails) {
     let {text, html, attachments} = composeEmail(parsedEmails)
-    
+
     let mail = new MailComposer({
         from: `${config.email.sender_name} <${config.email.email_address}>`,
         to: config.email.to,
