@@ -43,9 +43,14 @@ function saveBase64ValueToFileSync(base64, directory, fileName) {
     fs.writeFileSync(path.join(directory, fileName), buffer)
 }
 
+function removeFilesInDirectory(directory) {
+    fs.rmdirSync(directory, { recursive: true })
+}
+
 module.exports = {
     afterDate,
     encodeBase64,
     decodeBase64,
-    saveBase64ValueToFileSync
+    saveBase64ValueToFileSync,
+    removeFilesInDirectory
 }

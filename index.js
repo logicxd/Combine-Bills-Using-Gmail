@@ -11,7 +11,8 @@ const Utils = require('./utility')
 const moment = require('moment')
 const MailComposer = require('nodemailer/lib/mail-composer')
 
-let afterDate = Utils.afterDate()
+const afterDate = Utils.afterDate()
+const attachmentFileDirectory = 'attachments'
 
 async function start() {
     const labelsMap = await getLabels()
@@ -21,6 +22,7 @@ async function start() {
     const messageDetails = await getMessageDetails(messages, labelIds)
     const parsedEmails = await parseEmails(messageDetails, emailScripts)
     await sendEmail(parsedEmails)
+    Utils.removeFilesInDirectory(attachmentFileDirectory)
 }
 
 //////////// Helpers ////////////
@@ -111,7 +113,7 @@ async function getMessageDetails(messages, labelIds) {
                     let attachmentObject = {
                         id: rootPart.body.attachmentId,
                         base64Value: attachment.data.data,
-                        directory: 'attachments',
+                        directory: attachmentFileDirectory,
                         fileName: `${uuidv4()}.pdf`,
                     }
                     Utils.saveBase64ValueToFileSync(attachmentObject.base64Value, attachmentObject.directory, attachmentObject.fileName)
