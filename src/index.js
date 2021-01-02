@@ -17,12 +17,21 @@ const attachmentFileDirectory = 'attachments'
 async function start() {
     const labelsMap = await getLabels()
     const emailScripts = getEmailScripts()
+    const customScripts = getCustomScripts()
     const labelIds = filterLabelsBasedOnEmailScripts(labelsMap, emailScripts)
     const messages = await getEmailMessages(labelIds)
     const messageDetails = await getMessageDetails(messages, labelIds)
-    const parsedEmails = await parseEmails(messageDetails, emailScripts)
-    await sendEmail(parsedEmails)
+    const parsedData = await parseEmails(messageDetails, emailScripts)
+    addCustomScriptsToParsedData(parsedData, customScripts)
+    await sendEmail(parsedData)
     Utils.removeFilesInDirectory(attachmentFileDirectory)
+}
+
+function addCustomScriptsToParsedData(parsedData, customScripts) {
+    for (const customScript of customScripts) {
+        console.log(`Parsing for customscript: ${customScript.displayName}`)
+        parsedData.push(customScript.parse())
+    }
 }
 
 //////////// Helpers ////////////
@@ -47,6 +56,15 @@ function getEmailScripts() {
     glob.sync('./src/email_scripts/*.js').forEach(file => {
         let emailScripts = require(path.resolve(file))
         scripts.push(emailScripts)
+    })
+    return scripts
+}
+
+function getCustomScripts() {
+    let scripts = []
+    glob.sync('./src/custom_scripts/*.js').forEach(file => {
+        let customScripts = require(path.resolve(file))
+        scripts.push(customScripts)
     })
     return scripts
 }
@@ -146,7 +164,7 @@ async function parseEmails(messageDetails, emailScripts) {
         if (!emailScript.labelId) { continue }
         console.log(`Parsing for email script: ${emailScript.displayName}`)
         const messageDetail = messageDetails[emailScript.labelId]
-        parsedEmails.push(await emailScript.parseEmail(messageDetail))
+        parsedEmails.push(await emailScript.parse(messageDetail))
     }
     return parsedEmails
 }

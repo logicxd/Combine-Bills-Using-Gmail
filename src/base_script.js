@@ -30,8 +30,8 @@ const baseScript = {
         fileData: '<base64Value of the file>'
     }
      */
-    parseEmail: async function(messageDetail) {
-        throw 'Subclass must implement parseEmail(email)'
+    parse: async function(messageDetail) {
+        throw 'Subclass must implement parse(email)'
         this.price = 0
     },
 
