@@ -18,7 +18,7 @@ async function start() {
     const labelsMap = await getLabels()
     const emailScripts = getEmailScripts()
     const labelIds = filterLabelsBasedOnEmailScripts(labelsMap, emailScripts)
-    const messages = await gmail.users.messages.list({userId: 'me', labelIds: labelsMap[config.email.labelName], q: `after:${afterDate.format('YYYY/MM/DD')}`})
+    const messages = await getEmailMessages(labelIds)
     const messageDetails = await getMessageDetails(messages, labelIds)
     const parsedEmails = await parseEmails(messageDetails, emailScripts)
     await sendEmail(parsedEmails)
@@ -64,6 +64,18 @@ function filterLabelsBasedOnEmailScripts(labelsMap, emailScripts) {
     return labelIds
 }
 
+async function getEmailMessages(labelIds) {
+    const messages = []
+    const q = `after:${afterDate.format('YYYY/MM/DD')}`
+    for (const labelId of labelIds) {
+        const gmailResponse = await gmail.users.messages.list({userId: 'me', labelIds: labelId, q: q})
+        if (gmailResponse && gmailResponse.status == 200 && gmailResponse.data && gmailResponse.data.messages) {
+            messages.push(...gmailResponse.data.messages)
+        }
+    }
+    return messages
+}
+
 /**
  * Retrieves message details and maps them to labelIds.
  * @param {*} messages 
@@ -71,13 +83,13 @@ function filterLabelsBasedOnEmailScripts(labelsMap, emailScripts) {
  * @returns an object that maps labelIds to an array of messageDetails { 'LabelId1': [messageDetail1, messageDetail2]}
  */
 async function getMessageDetails(messages, labelIds) {
-    if (!messages || messages.status != 200 || !messages.data || !messages.data.messages) {
+    if (!messages) {
         throw('Failed to get email message details')
     }
 
     let messageDetails = {}
     labelIds = new Set(labelIds)
-    for (const message of messages.data.messages) {
+    for (const message of messages) {
         let messageDetail = await gmail.users.messages.get({userId: 'me', id: message.id})
         if (!messageDetail || messageDetail.status != 200 || !messageDetail.data || !messageDetail.data.payload) {
             continue

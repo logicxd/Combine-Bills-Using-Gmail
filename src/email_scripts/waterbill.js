@@ -18,7 +18,7 @@ waterBill.parseEmail = async function(messageDetail) {
         console.warn('No water bill found this month.')
         return parsedObject
     }
-    if (messageDetail.attachments || messageDetail.attachments.length < 1) {
+    if (!messageDetail.attachments || messageDetail.attachments.length < 1) {
         console.warn('PDF attachments not found. Water bill cannot be retrieved.')
         return parsedObject
     }
