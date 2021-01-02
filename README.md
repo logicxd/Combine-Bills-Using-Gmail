@@ -122,3 +122,12 @@ To enable it, add the property `cronitor_code` to your `config/config.secret.jso
 ## Future
 
 1. Check counting for multiple bills.
+
+---
+
+## Resources
+
+* Get Google API refresh token - [stackoverflow](https://stackoverflow.com/a/19766913).
+* [Crontab on raspberry pi](https://raspberrytips.com/schedule-task-raspberry-pi/).
+* [Cronitor](http://cronitor.io/) - monitor crontabs.
+* [Nodemailer](https://nodemailer.com/about/) for composing email messages
