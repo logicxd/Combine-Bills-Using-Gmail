@@ -3,6 +3,7 @@
 const fs = require('fs')
 const path = require('path')
 const moment = require('moment')
+const rmdir = require('rimraf')
 
 /**
  * @returns current date minus 1 month and 1 day. The 1 extra day is just to make sure we don't miss anything.
@@ -44,7 +45,11 @@ function saveBase64ValueToFileSync(base64, directory, fileName) {
 }
 
 function removeFilesInDirectory(directory) {
-    fs.rmdirSync(directory, { recursive: true })
+    rmdir(directory, error => {
+        if (error) {
+            console.error(`Error cleaning up attachments: ${error}`)
+        }
+    })
 }
 
 module.exports = {
