@@ -1,5 +1,5 @@
 {
-    "refresh_token": "",
+    "refresh_token": "SAMPLE - create your own 'config.production.json' or 'config.development.json' file to use",
     "client_id": "",
     "client_secret": "",
     "email": {

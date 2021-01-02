@@ -1,7 +1,7 @@
 "use strict";
 
 const google = require('./googleapi')
-const config = require('./config/config.development.json')
+const config = require('../config/config.development.json')
 const gmail = google.gmail('v1')
 const glob = require('glob')
 const path = require('path')
@@ -44,7 +44,7 @@ async function getLabels() {
 
 function getEmailScripts() {
     let scripts = []
-    glob.sync('./email_scripts/*.js').forEach(file => {
+    glob.sync('./src/email_scripts/*.js').forEach(file => {
         let emailScripts = require(path.resolve(file))
         scripts.push(emailScripts)
     })
@@ -141,7 +141,7 @@ async function parseEmails(messageDetails, emailScripts) {
 
 async function sendEmail(parsedEmails) {
     let {text, html, attachments} = composeEmail(parsedEmails)
-
+    
     let mail = new MailComposer({
         from: `${config.email.sender_name} <${config.email.email_address}>`,
         to: config.email.to,

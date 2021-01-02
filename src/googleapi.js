@@ -1,7 +1,7 @@
 "use strict";
 
 const {google} = require('googleapis');
-const config = require('./config/config.development.json')
+const config = require('../config/config.development.json')
 
 function authenticateWithExistingRefreshToken() {
     const oauth2Client = new google.auth.OAuth2(
