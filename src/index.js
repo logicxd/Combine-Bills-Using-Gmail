@@ -25,8 +25,8 @@ async function start() {
     const parsedData = await parseEmails(messageDetails, emailScripts)
     addCustomScriptsToParsedData(parsedData, customScripts)
     await sendEmail(parsedData)
-    Utils.removeFilesInDirectory(attachmentFileDirectory)
     await applyProcessedLabelIfNeeded(labelsMap, messages)
+    Utils.removeFilesInDirectory(attachmentFileDirectory)
 }
 
 //////////// Helpers ////////////
@@ -286,4 +286,7 @@ async function applyProcessedLabelIfNeeded(labelsMap, messageDetails) {
     }
 }
 
-start()
+var t0 = performance.now()
+console.log('Starting...')
+await start()
+console.log(`Finished - took ${t0-performance.now()} milliseconds.`)
