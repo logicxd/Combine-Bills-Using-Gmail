@@ -202,8 +202,6 @@ function addCustomScriptsToParsedData(parsedData, customScripts) {
 
 async function sendEmail(parsedEmails) {
     let {text, html, attachments} = composeEmail(parsedEmails)
-    
-    return // TODO: remove this later
 
     let mail = new MailComposer({
         from: `${config.email.sender_name} <${config.email.email_address}>`,
