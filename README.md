@@ -109,13 +109,13 @@ You don't have to use Raspberry Pi if you know of a way to set up a scheduler yo
 
 Enabling this adds a "Processed" label to your email after the script has finished running. By doing this, it can check to make sure emails are not double-counted by ignoring all the "Processed" emails.
 
-To enable it, add the property `email.processedLabelName` to your [config/config.secret.json](config/config.secret.json) and give it whatever name you'd like it to be called, for example: "Automated/Processed" is what I used.
+To enable it, add the property `email.processedLabelName` to your `config/config.secret.json` and give it whatever name you'd like it to be called, for example: "Automated/Processed" is what I used.
 
 ### Cronitor
 
 I'm using [Cronitor](http://cronitor.io/) to notify me in case my raspberry pi doesn't send out an email. It's definitely not required but would help remind me in case something goes wrong.
 
-To enable it, add the property `cronitor_code` to your [config/config.secret.json](config/config.secret.json) with the value you get from Cronitor such as "abc123".
+To enable it, add the property `cronitor_code` to your `config/config.secret.json` with the value you get from Cronitor such as "abc123".
 
 ---
 
