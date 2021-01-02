@@ -9,9 +9,18 @@ const waterBill = Object.create(baseEmailScript)
 waterBill.displayName = 'Water'
 waterBill.labelName = 'Automated/MitchellPlace/Water'
 waterBill.parseEmail = async function(messageDetail) {
-    if (!messageDetail || !messageDetail.attachments || messageDetail.attachments.length < 1) {
+    let parsedObject = {
+        billAmount: parseFloat(0),
+        billDescription: `Water: $0 (billed once every 2 months)`
+    }
+
+    if (!messageDetail) {
+        console.warn('No water bill found this month.')
+        return parsedObject
+    }
+    if (messageDetail.attachments || messageDetail.attachments.length < 1) {
         console.warn('PDF attachments not found. Water bill cannot be retrieved.')
-        return {success: false}
+        return parsedObject
     }
 
     const attachment = messageDetail.attachments[0]
@@ -23,19 +32,20 @@ waterBill.parseEmail = async function(messageDetail) {
     let billAmount = 0
     for (const text of lineSeparatedArray) {
         if (isTotalAmountDueTextFound && text.includes('$')) {
-            billAmount = parseFloat(text.split('$')[1])
+            billAmount = text.split('$')[1]
             break
         } else if (text === 'Total Amount Due') {
             isTotalAmountDueTextFound = true
         }
     }
 
-    let parsedObject = {
-        success: isTotalAmountDueTextFound,
-        billAmount,
-        billDescription: `Water: $${billAmount} (billed once every 2 months)`,
-        fileName: `Water_${attachment.fileName}`,
-        fileData: attachment.base64Value
+    if (isTotalAmountDueTextFound) {
+        parsedObject = {
+            billAmount: parseFloat(billAmount),
+            billDescription: `Water: $${billAmount} (billed once every 2 months)`,
+            fileName: `Water_${attachment.fileName}`,
+            fileData: attachment.base64Value
+        }
     }
     return parsedObject
 }

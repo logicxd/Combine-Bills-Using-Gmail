@@ -20,14 +20,12 @@ const baseEmailScript = {
     /**
      * Given the email object
      * Should return an object with properties: 
-     *   success - boolean that indicates whether or not it parsed successfully.
      *   billAmount - float amount of the bill. Use parseFloat(amount) to get the float value.
      *   billDescription - the text that will be displayed on the body of the email. Include the bill amount here.
      *   fileName - optional if there is an attachment. This will be used as the file name of the attachment in the email.
      *   fileData - optional if there is an attachment. This should be the base64Value of the file.
      * Example: 
      let parsedObject = {
-        success: true,
         billAmount: 51.12,
         billDescription: 'Water: $51.12 (billed once every 2 months)',
         fileName: 'Water_Bill.pdf',

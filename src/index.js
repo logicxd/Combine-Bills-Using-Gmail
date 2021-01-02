@@ -130,11 +130,11 @@ async function getMessageDetails(messages, labelIds) {
 
 async function parseEmails(messageDetails, emailScripts) {
     let parsedEmails = []
-    for (const [key, value] of Object.entries(messageDetails)) {
-        let emailScript = _.find(emailScripts, script => { return script.labelId === key })
-        if (!emailScript) { continue }
+    for (const emailScript of emailScripts) {
+        if (!emailScript.labelId) { continue }
         console.log(`Parsing for email script: ${emailScript.displayName}`)
-        parsedEmails.push(await emailScript.parseEmail(value))
+        const messageDetail = messageDetails[emailScript.labelId]
+        parsedEmails.push(await emailScript.parseEmail(messageDetail))
     }
     return parsedEmails
 }
@@ -142,6 +142,8 @@ async function parseEmails(messageDetails, emailScripts) {
 async function sendEmail(parsedEmails) {
     let {text, html, attachments} = composeEmail(parsedEmails)
     
+    return // TODO: remove this later
+
     let mail = new MailComposer({
         from: `${config.email.sender_name} <${config.email.email_address}>`,
         to: config.email.to,
@@ -174,8 +176,6 @@ function composeEmail(parsedEmails) {
     html += `\n<ul>`
 
     for (const parsedEmail of parsedEmails) {
-        if (!parsedEmail.success) { continue }
-
         totalAmount += parseFloat(parsedEmail.billAmount)
         text += `\n* ${parsedEmail.billDescription}`
         html += `\n<li>${parsedEmail.billDescription}</li>`

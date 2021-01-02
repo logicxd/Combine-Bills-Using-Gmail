@@ -9,8 +9,14 @@ const pgeBill = Object.create(baseEmailScript)
 pgeBill.displayName = 'PG&E'
 pgeBill.labelName = 'Automated/MitchellPlace/PGnE'
 pgeBill.parseEmail = async function(messageDetail) {
+    let parsedObject = {
+        billAmount: parseFloat(0),
+        billDescription: 'PG&E Electricity and Gas: $0'
+    }
+
     if (!messageDetail) {
-        return {success: false}
+        console.warn('No PG&E bill found this month.')
+        return parsedObject
     }
 
     const attachment = messageDetail.attachments.length > 0 ? messageDetail.attachments[0] : null
@@ -22,15 +28,14 @@ pgeBill.parseEmail = async function(messageDetail) {
     let billAmount = splitbySpace.length > 0 ? splitbySpace[0] : null
 
     if (billAmount) {
-        return {
-            success: billAmount,
+        parsedObject = {
             billAmount: parseFloat(billAmount),
             billDescription: `PG&E Electricity and Gas: $${billAmount} (PDF password: PdgriSkgoU8MQ6Aj)`,
             fileName: attachment ? `PG&E_${attachment.fileName}` : null,
             fileData: attachment ? attachment.base64Value : null
         }
-    } else {
-        return {success: false}
     }
+
+    return parsedObject
 }
 module.exports = pgeBill
