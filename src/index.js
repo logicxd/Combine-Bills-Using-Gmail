@@ -25,8 +25,8 @@ async function start() {
     const parsedData = await parseEmails(messageDetails, emailScripts)
     addCustomScriptsToParsedData(parsedData, customScripts)
     await sendEmail(parsedData)
-    await applyProcessedLabelIfNeeded(labelsMap, messages)
     Utils.removeFilesInDirectory(attachmentFileDirectory)
+    await applyProcessedLabelIfNeeded(labelsMap, messages)
 }
 
 //////////// Helpers ////////////
