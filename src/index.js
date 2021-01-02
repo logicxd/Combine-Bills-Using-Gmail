@@ -10,11 +10,15 @@ const { v4: uuidv4 } = require('uuid')
 const Utils = require('./utility')
 const moment = require('moment')
 const MailComposer = require('nodemailer/lib/mail-composer')
+const {performance} = require('perf_hooks')
 
 const afterDate = Utils.afterDate()
 const attachmentFileDirectory = 'attachments'
 
 async function start() {
+    var t0 = performance.now()
+    console.log('Starting auto-fetch-monthly-bills...')
+
     await createProcessedLabelIfNeeded()
     const labelsMap = await getLabels()
     const emailScripts = getEmailScripts()
@@ -27,6 +31,8 @@ async function start() {
     await sendEmail(parsedData)
     await applyProcessedLabelIfNeeded(labelsMap, messages)
     Utils.removeFilesInDirectory(attachmentFileDirectory)
+
+    console.log(`\nFinished - took ${performance.now()-t0} milliseconds.`)
 }
 
 //////////// Helpers ////////////
@@ -286,7 +292,4 @@ async function applyProcessedLabelIfNeeded(labelsMap, messageDetails) {
     }
 }
 
-var t0 = performance.now()
-console.log('Starting...')
-await start()
-console.log(`Finished - took ${t0-performance.now()} milliseconds.`)
+start()
