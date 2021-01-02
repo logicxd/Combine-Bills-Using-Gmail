@@ -12,6 +12,7 @@ const logger = Utils.logger
 const moment = require('moment')
 const MailComposer = require('nodemailer/lib/mail-composer')
 const {performance} = require('perf_hooks')
+const http = require('http')
 
 const afterDate = Utils.afterDate()
 const attachmentFileDirectory = 'attachments'
@@ -32,6 +33,7 @@ async function start() {
     await sendEmail(parsedData)
     await applyProcessedLabelIfNeeded(labelsMap, messages)
     Utils.removeFilesInDirectory(attachmentFileDirectory)
+    notifyCronitorIfNeeded()
 
     logger.info(`\nFinished - took ${performance.now()-t0} milliseconds.`)
 }
@@ -291,6 +293,17 @@ async function applyProcessedLabelIfNeeded(labelsMap, messageDetails) {
             }
         })
     }
+}
+
+function notifyCronitorIfNeeded() {
+    if (!config.cronitor_code) { return }
+
+    http.get({
+        host: 'cronitor.link',
+        path: `/${config.cronitor_code}`
+    }, response => {
+        // No-op
+    })
 }
 
 start()

@@ -4,6 +4,7 @@
     "refresh_token": "SAMPLE - create your own ",
     "client_id": "",
     "client_secret": "",
+    "cronitor_code": "",  // Optional if you use cronitor to monitor your crontab
     "email": {
         "sender_name": "Autobot",
         "email_address": "sample_from@email.com",
