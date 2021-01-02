@@ -1,0 +1,14 @@
+// This is a sample config file. Please create your own 'config.secret.json' file to use.
+
+{
+    "refresh_token": "SAMPLE - create your own ",
+    "client_id": "",
+    "client_secret": "",
+    "email": {
+        "sender_name": "Autobot",
+        "email_address": "sample_from@email.com",
+        "subject": "Automated Bill",
+        "to": ["sample_to@email.com"],
+        "processedLabelName": "Automated/Processed"     // Optional. Include this if you want the app to exclude double-counting emails
+    }
+}
