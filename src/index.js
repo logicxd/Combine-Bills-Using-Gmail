@@ -19,7 +19,7 @@ const attachmentFileDirectory = 'attachments'
 
 async function start() {
     var t0 = performance.now()
-    logger.info('Starting auto-fetch-monthly-bills...')
+    logger.info('Starting...')
 
     await createProcessedLabelIfNeeded()
     const labelsMap = await getLabels()
@@ -186,7 +186,11 @@ async function getMessageDetails(messages, labelIds, processedLabelId) {
             }
         }
         object.payload = messageDetail.data.payload
-        messageDetails[object.labelId] = object
+
+        if (!messageDetails[object.labelId]) {
+            messageDetails[object.labelId] = []
+        }
+        messageDetails[object.labelId].push(object)
     }
     return messageDetails
 }
@@ -196,8 +200,15 @@ async function parseEmails(messageDetails, emailScripts) {
     for (const emailScript of emailScripts) {
         if (!emailScript.labelId) { continue }
         logger.info(`Parsing for email script: ${emailScript.displayName}`)
-        const messageDetail = messageDetails[emailScript.labelId]
-        parsedEmails.push(await emailScript.parse(messageDetail))
+
+        const emails = messageDetails[emailScript.labelId]
+        if (emails && emails.length > 0) {
+            for (const email of emails) {
+                parsedEmails.push(await emailScript.parse(email))
+            }
+        } else {
+            parsedEmails.push(await emailScript.parse(null))
+        }
     }
     return parsedEmails
 }

@@ -121,7 +121,7 @@ To enable it, add the property `cronitor_code` to your `config/config.secret.jso
 
 ## Future
 
-1. Check counting for multiple bills.
+1. Threaded emails are not picked up. Don't think we would encounter this scenario unless if you're forwarding it to yourself multiple times (like I did in my testing :D)
 
 ---
 

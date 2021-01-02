@@ -19,8 +19,7 @@ pgeBill.parse = async function(messageDetail) {
         return parsedObject
     }
 
-    const attachment = messageDetail.attachments.length > 0 ? messageDetail.attachments[0] : null
-    let isTotalAmountDueTextFound = false
+    const attachment = messageDetail.attachments && messageDetail.attachments.length > 0 ? messageDetail.attachments[0] : null
     let text = Utils.decodeBase64(messageDetail.body)
     let split = text.split('The amount of $')
     let textContainingTheAmount = split.length == 2 ? split[1] : null
