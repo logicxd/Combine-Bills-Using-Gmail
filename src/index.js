@@ -8,6 +8,7 @@ const path = require('path')
 const _ = require('underscore')
 const { v4: uuidv4 } = require('uuid')
 const Utils = require('./utility')
+const logger = Utils.logger
 const moment = require('moment')
 const MailComposer = require('nodemailer/lib/mail-composer')
 const {performance} = require('perf_hooks')
@@ -17,7 +18,7 @@ const attachmentFileDirectory = 'attachments'
 
 async function start() {
     var t0 = performance.now()
-    console.log('Starting auto-fetch-monthly-bills...')
+    logger.info('Starting auto-fetch-monthly-bills...')
 
     await createProcessedLabelIfNeeded()
     const labelsMap = await getLabels()
@@ -32,7 +33,7 @@ async function start() {
     await applyProcessedLabelIfNeeded(labelsMap, messages)
     Utils.removeFilesInDirectory(attachmentFileDirectory)
 
-    console.log(`\nFinished - took ${performance.now()-t0} milliseconds.`)
+    logger.info(`\nFinished - took ${performance.now()-t0} milliseconds.`)
 }
 
 //////////// Helpers ////////////
@@ -52,11 +53,11 @@ async function createProcessedLabelIfNeeded() {
         }
     }, error => {
         if (!error) {
-            console.log(`Label "${config.email.processedLabelName}" created`)
+            logger.info(`Label "${config.email.processedLabelName}" created`)
         } else if (error.code == 409) {
             // Label already exists - no action needed
         } else {
-            console.error(`Error while creating label: ${error}`)
+            logger.error(`Error while creating label: ${error}`)
         }
     })
 }
@@ -139,7 +140,7 @@ async function getMessageDetails(messages, labelIds, processedLabelId) {
             continue
         }
         if (processedLabelId && messageDetail.data.labelIds.includes(processedLabelId)) {
-            console.warn(`Skipping email id ${messageDetail.data.id} since it has already been processed`)
+            logger.warn(`Skipping email id ${messageDetail.data.id} since it has already been processed`)
             continue 
         }
 
@@ -192,7 +193,7 @@ async function parseEmails(messageDetails, emailScripts) {
     let parsedEmails = []
     for (const emailScript of emailScripts) {
         if (!emailScript.labelId) { continue }
-        console.log(`Parsing for email script: ${emailScript.displayName}`)
+        logger.info(`Parsing for email script: ${emailScript.displayName}`)
         const messageDetail = messageDetails[emailScript.labelId]
         parsedEmails.push(await emailScript.parse(messageDetail))
     }
@@ -201,7 +202,7 @@ async function parseEmails(messageDetails, emailScripts) {
 
 function addCustomScriptsToParsedData(parsedData, customScripts) {
     for (const customScript of customScripts) {
-        console.log(`Parsing for customscript: ${customScript.displayName}`)
+        logger.info(`Parsing for customscript: ${customScript.displayName}`)
         parsedData.push(customScript.parse())
     }
 }
@@ -228,7 +229,7 @@ async function sendEmail(parsedEmails) {
         }
     })
     if (response.status != 200) {
-        console.error(`Failed to send email. ${response}`)
+        logger.error(`Failed to send email. ${response}`)
     }
 }
 
@@ -257,14 +258,14 @@ function composeEmail(parsedEmails) {
     text += '\n------------------------------------------'
     text += `\nThis bill was auto-generated and ran on ${todayDate.format('MM/DD/YYYY')}. `
     text += `It looked for any new bills that came in a month ago after ${afterDate.format('MM/DD/YYYY')}`
-    console.log(`\nComposed Email in plain-text: \n${text}`)
+    logger.info(`\nComposed Email in plain-text: \n${text}`)
 
     html += `\n</ul>`
     html += `<br/><div>Total: <b>$${totalAmount.toFixed(2)}</b></div>`
     html += '<div>------------------------------------------</div>'
     html += `<div>This bill was auto-generated and ran on ${todayDate.format('MM/DD/YYYY')}. `
     html += `It looked for any new bills that came in a month ago after ${afterDate.format('MM/DD/YYYY')}</div>`
-    console.log(`\nComposed Email in HTML: \n${html}`)
+    logger.info(`\nComposed Email in HTML: \n${html}`)
 
     return {
         text,
@@ -286,7 +287,7 @@ async function applyProcessedLabelIfNeeded(labelsMap, messageDetails) {
             }
         }, error => {
             if (error) {
-                console.error(`Error while adding processed label: ${error}`)
+                logger.error(`Error while adding processed label: ${error}`)
             }
         })
     }

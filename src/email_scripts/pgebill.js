@@ -15,7 +15,7 @@ pgeBill.parse = async function(messageDetail) {
     }
 
     if (!messageDetail) {
-        console.warn('No PG&E bill found this month.')
+        Utils.logger.warn('No PG&E bill found this month.')
         return parsedObject
     }
 

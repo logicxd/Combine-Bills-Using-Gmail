@@ -3,6 +3,36 @@
 const fs = require('fs')
 const path = require('path')
 const moment = require('moment')
+const winston = require('winston');
+const { createLogger, transports, format } = require('winston');
+
+// Logs
+const logger = winston.createLogger({
+    level: 'info',
+    format: format.combine(
+        format.timestamp({
+          format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        format.errors({ stack: true }),
+        format.splat(),
+        format.json()
+    ),
+    transports: [
+        new transports.File({ filename: './output-combined.log' }),
+        new transports.File({ filename: './output-error.log', level: 'error' }),
+    ]
+})
+
+// if (process.env.NODE_ENV !== 'production') {
+    logger.add(new transports.Console({
+        format: format.combine(
+          format.colorize(),
+          format.simple()
+        )
+    }));    
+// }
+
+// End logs 
 
 /**
  * @returns current date minus 1 month and 1 day. The 1 extra day is just to make sure we don't miss anything.
@@ -48,6 +78,7 @@ function removeFilesInDirectory(directory) {
 }
 
 module.exports = {
+    logger,
     afterDate,
     encodeBase64,
     decodeBase64,

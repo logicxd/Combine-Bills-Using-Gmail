@@ -3,6 +3,7 @@
 const fs = require('fs');
 const path = require('path')
 const pdf = require('pdf-parse');
+const Utils = require('../utility')
 
 const baseScript = require("../base_script");
 const waterBill = Object.create(baseScript)
@@ -15,11 +16,11 @@ waterBill.parse = async function(messageDetail) {
     }
 
     if (!messageDetail) {
-        console.warn('No water bill found this month.')
+        Utils.logger.warn('No water bill found this month.')
         return parsedObject
     }
     if (!messageDetail.attachments || messageDetail.attachments.length < 1) {
-        console.warn('PDF attachments not found. Water bill cannot be retrieved.')
+        Utils.logger.warn('PDF attachments not found. Water bill cannot be retrieved.')
         return parsedObject
     }
 
