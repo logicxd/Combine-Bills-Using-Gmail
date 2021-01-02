@@ -1,7 +1,7 @@
 "use strict";
 
+const config = require('../config/config.secret.json')
 const google = require('./googleapi')
-const config = require('../config/config.development.json')
 const gmail = google.gmail('v1')
 const glob = require('glob')
 const path = require('path')
@@ -15,26 +15,46 @@ const afterDate = Utils.afterDate()
 const attachmentFileDirectory = 'attachments'
 
 async function start() {
+    await createProcessedLabelIfNeeded()
     const labelsMap = await getLabels()
     const emailScripts = getEmailScripts()
     const customScripts = getCustomScripts()
     const labelIds = filterLabelsBasedOnEmailScripts(labelsMap, emailScripts)
     const messages = await getEmailMessages(labelIds)
-    const messageDetails = await getMessageDetails(messages, labelIds)
+    const messageDetails = await getMessageDetails(messages, labelIds, labelsMap[config.email.processedLabelName])
     const parsedData = await parseEmails(messageDetails, emailScripts)
     addCustomScriptsToParsedData(parsedData, customScripts)
     await sendEmail(parsedData)
     Utils.removeFilesInDirectory(attachmentFileDirectory)
-}
-
-function addCustomScriptsToParsedData(parsedData, customScripts) {
-    for (const customScript of customScripts) {
-        console.log(`Parsing for customscript: ${customScript.displayName}`)
-        parsedData.push(customScript.parse())
-    }
+    await applyProcessedLabelIfNeeded(labelsMap, messages)
 }
 
 //////////// Helpers ////////////
+async function createProcessedLabelIfNeeded() {
+    if (!config.email.processedLabelName) { return }
+    gmail.users.labels.create({
+        userId: 'me', 
+        requestBody: {
+            "name": config.email.processedLabelName,
+            "messageListVisibility": "show",
+            "labelListVisibility": "labelShow",
+            "type": "user",
+            "color": {
+                "textColor": "#04502e",
+                "backgroundColor": "#a2dcc1"
+            }
+        }
+    }, error => {
+        if (!error) {
+            console.log(`Label "${config.email.processedLabelName}" created`)
+        } else if (error.code == 409) {
+            // Label already exists - no action needed
+        } else {
+            console.error(`Error while creating label: ${error}`)
+        }
+    })
+}
+
 async function getLabels() {
     const labels = await gmail.users.labels.list({userId: 'me'})
 
@@ -100,7 +120,7 @@ async function getEmailMessages(labelIds) {
  * @param {*} labelIds 
  * @returns an object that maps labelIds to an array of messageDetails { 'LabelId1': [messageDetail1, messageDetail2]}
  */
-async function getMessageDetails(messages, labelIds) {
+async function getMessageDetails(messages, labelIds, processedLabelId) {
     if (!messages) {
         throw('Failed to get email message details')
     }
@@ -111,6 +131,10 @@ async function getMessageDetails(messages, labelIds) {
         let messageDetail = await gmail.users.messages.get({userId: 'me', id: message.id})
         if (!messageDetail || messageDetail.status != 200 || !messageDetail.data || !messageDetail.data.payload) {
             continue
+        }
+        if (processedLabelId && messageDetail.data.labelIds.includes(processedLabelId)) {
+            console.warn(`Skipping email id ${messageDetail.data.id} since it has already been processed`)
+            continue 
         }
 
         const object = {
@@ -167,6 +191,13 @@ async function parseEmails(messageDetails, emailScripts) {
         parsedEmails.push(await emailScript.parse(messageDetail))
     }
     return parsedEmails
+}
+
+function addCustomScriptsToParsedData(parsedData, customScripts) {
+    for (const customScript of customScripts) {
+        console.log(`Parsing for customscript: ${customScript.displayName}`)
+        parsedData.push(customScript.parse())
+    }
 }
 
 async function sendEmail(parsedEmails) {
@@ -235,6 +266,25 @@ function composeEmail(parsedEmails) {
         text,
         html, 
         attachments
+    }
+}
+
+async function applyProcessedLabelIfNeeded(labelsMap, messageDetails) {
+    const labelId = labelsMap[config.email.processedLabelName]
+    if (!labelId) { return }
+
+    for (const messageDetail of messageDetails) {
+        gmail.users.messages.modify({
+            userId: 'me',
+            id: messageDetail.id,
+            requestBody: {
+                addLabelIds: [labelId]
+            }
+        }, error => {
+            if (error) {
+                console.error(`Error while adding processed label: ${error}`)
+            }
+        })
     }
 }
 
