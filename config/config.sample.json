@@ -1,12 +1,11 @@
 // This is a sample config file. Please create your own 'config.secret.json' file to use.
-
 {
-    "refresh_token": "SAMPLE - create your own ",
+    "refresh_token": "token",
     "client_id": "id",
     "client_secret": "secret",
-    "cronitor_code": "abc123",  // Optional if you use cronitor to monitor your crontab
+    "cronitor_code": "abc123",  // Optional. Include this if you want use Cronitor to monitor your crontab
     "email": {
-        "sender_name": "Autobot",
+        "sender_name": "Automated Bill",
         "email_address": "sample_from@email.com",
         "subject": "Automated Bill",
         "to": ["sample_to@email.com"],

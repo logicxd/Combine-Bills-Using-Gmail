@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/logicxd/auto-fetch-monthly-bills.git"
+    "url": "git+https://github.com/logicxd/Combine-Bills-Using-Gmail.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/logicxd/auto-fetch-monthly-bills/issues"
+    "url": "https://github.com/logicxd/Combine-Bills-Using-Gmail/issues"
   },
-  "homepage": "https://github.com/logicxd/auto-fetch-monthly-bills#readme",
+  "homepage": "https://github.com/logicxd/Combine-Bills-Using-Gmail#readme",
   "dependencies": {
     "glob": "^7.1.6",
     "googleapis": "^66.0.0",

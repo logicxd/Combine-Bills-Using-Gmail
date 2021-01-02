@@ -3,7 +3,7 @@
 const baseScript = require("../base_script");
 const garbageBill = Object.create(baseScript)
 garbageBill.displayName = 'Garbage'
-garbageBill.labelName = 'Automated/MitchellPlace/Garbage'
+garbageBill.labelName = 'Automated/HomeBill/Garbage'
 garbageBill.parse = function() {
     const constantGarbageBillAmount = parseFloat(35)
     return {

@@ -8,7 +8,7 @@ const Utils = require('../utility')
 const baseScript = require("../base_script");
 const waterBill = Object.create(baseScript)
 waterBill.displayName = 'Water'
-waterBill.labelName = 'Automated/MitchellPlace/Water'
+waterBill.labelName = 'Automated/HomeBill/Water'
 waterBill.parse = async function(messageDetail) {
     let parsedObject = {
         billAmount: parseFloat(0),

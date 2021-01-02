@@ -7,7 +7,7 @@ const Utils = require('../utility')
 const baseScript = require("../base_script");
 const pgeBill = Object.create(baseScript)
 pgeBill.displayName = 'PG&E'
-pgeBill.labelName = 'Automated/MitchellPlace/PGnE'
+pgeBill.labelName = 'Automated/HomeBill/PGnE'
 pgeBill.parse = async function(messageDetail) {
     let parsedObject = {
         billAmount: parseFloat(0),
