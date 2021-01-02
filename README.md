@@ -84,7 +84,7 @@ If you want to change this, you can change it in [src/utility.js](src/utility.js
 
 ### Check Logs
 
-Logs will be created at the root level as [output-combined.log](output-combined.log) and [output-error.log](output-error.log) everytime it runs. You should be able to see it in the console logs and in those files.
+Logs will be created at the root level as `./output-combined.log` and `./output-error.log` everytime it runs. You should be able to see it in the console logs and in those files.
 
 ### How Do Attachments Work?
 
