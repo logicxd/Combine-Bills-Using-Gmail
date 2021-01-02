@@ -2,7 +2,7 @@
 
 Customizable and extensible way of collecting all your bills before sending out an email with a final receipt to your recipients.
 
-![Composed Email](https://user-images.githubusercontent.com/12219300/103454759-00628d80-4c9c-11eb-99e5-35a6e7af1412.png)
+![Composed Email](https://user-images.githubusercontent.com/12219300/103457672-18470b00-4cb6-11eb-9e84-5c69af90e90a.png)
 
 ## How It Works
 
