@@ -2,9 +2,11 @@
 
 /**
  * JavaScript doesn't support interfaces so sub-classing is used in place.
- * All email scripts must subclass this class.
+ * All scripts must subclass this class.
  */
-const baseEmailScript = {
+const baseScript = {
+    /** Your custom email scripts should set these properties below */
+
     /**
      * Display name to be used in composing the email
      */
@@ -13,10 +15,6 @@ const baseEmailScript = {
      * LabelName of the emails to check.
      */
     labelName: null,
-    /**
-     * LabelId that will be fetched dynamically from API results
-     */
-    labelId: null,
     /**
      * Given the email object
      * Should return an object with properties: 
@@ -36,6 +34,13 @@ const baseEmailScript = {
         throw 'Subclass must implement parseEmail(email)'
         this.price = 0
     },
+
+    /** Other properties that will be set on this object automatically*/
+
+    /**
+     * (DON'T SET THIS) labelId will be fetched dynamically from API results in index.js filterLabelsBasedOnEmailScripts
+     */
+    labelId: null,
 }
 
-module.exports = baseEmailScript
+module.exports = baseScript

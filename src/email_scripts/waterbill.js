@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path')
 const pdf = require('pdf-parse');
 
-const baseEmailScript = require("./base_email_script");
-const waterBill = Object.create(baseEmailScript)
+const baseScript = require("../base_script");
+const waterBill = Object.create(baseScript)
 waterBill.displayName = 'Water'
 waterBill.labelName = 'Automated/MitchellPlace/Water'
 waterBill.parseEmail = async function(messageDetail) {

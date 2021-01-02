@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path')
 const Utils = require('../utility')
 
-const baseEmailScript = require("./base_email_script");
-const pgeBill = Object.create(baseEmailScript)
+const baseScript = require("../base_script");
+const pgeBill = Object.create(baseScript)
 pgeBill.displayName = 'PG&E'
 pgeBill.labelName = 'Automated/MitchellPlace/PGnE'
 pgeBill.parseEmail = async function(messageDetail) {

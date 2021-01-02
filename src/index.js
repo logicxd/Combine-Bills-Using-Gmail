@@ -204,14 +204,14 @@ function composeEmail(parsedEmails) {
     text += '\n--------------------------------------------------------'
     text += `\nThis bill was auto-generated and ran on ${todayDate.format('MM/DD/YYYY')}. `
     text += `It looked for any new bills that came in a month ago after ${afterDate.format('MM/DD/YYYY')}`
-    console.log(`Sending: \n${text}`)
+    console.log(`\nComposed Email in plain-text: \n${text}`)
 
     html += `\n</ul>`
     html += `<br/><div>Total: <b>$${totalAmount.toFixed(2)}</b></div>`
     html += '<div>--------------------------------------------------------</div>'
     html += `<div>This bill was auto-generated and ran on ${todayDate.format('MM/DD/YYYY')}. `
     html += `It looked for any new bills that came in a month ago after ${afterDate.format('MM/DD/YYYY')}</div>`
-    console.log(`HTML: \n${html}`)
+    console.log(`\nComposed Email in HTML: \n${html}`)
 
     return {
         text,
