@@ -1,4 +1,4 @@
-# Combine Bills Using Gmail
+# Combine Email Bills Using Gmail API
 
 Customizable and extensible way of collecting all your bills before sending out an email with a final receipt to your recipients.
 
@@ -126,6 +126,7 @@ To enable it, add the property `cronitor_code` to your `config/config.secret.jso
 ## Future
 
 1. Threaded emails are not picked up. Don't think we would encounter this scenario unless if you're forwarding it to yourself multiple times (like I did in my testing :D)
+2. Calculate and split bill amount for each person.
 
 ---
 
