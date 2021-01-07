@@ -2,10 +2,10 @@
 
 Customizable and extensible way of collecting all your bills before sending out an email with a final receipt to your recipients.
 
-From this: 
+From emails in your inbox: 
 ![Inbox Emails](https://user-images.githubusercontent.com/12219300/103873116-2dd87e00-5084-11eb-8ab6-d4c1b7be8ec6.png)
 
-To this:
+To sending out:
 ![Composed Email](https://user-images.githubusercontent.com/12219300/103457672-18470b00-4cb6-11eb-9e84-5c69af90e90a.png)
 
 ## How It Works
