@@ -1,5 +1,15 @@
 # Combine Email Bills Using Gmail API
 
+Superceded by https://github.com/logicxd/Monthly-Bill-Generator-Apps-Script
+
+## Reason for Dropping the Project
+
+After a couple of months, I ran into a few difficulties that would require me to re-think my logic for writing scripts like this. 
+1. The refresh token expires after 7 days so you'd have to keep requesting token. This means this is not really automated anymore. For long lasting accounts, you could use a service account but this requires a GSuite account.
+2. Found out about Google App Scripts. I'm in the process of migrating all this work into Google App Scripts.
+
+--- 
+
 Customizable and extensible way of collecting all your bills before sending out an email with a final receipt to your recipients.
 
 From emails in your inbox: 
